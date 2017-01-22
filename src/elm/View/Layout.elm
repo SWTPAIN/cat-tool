@@ -71,48 +71,17 @@ renderSite ctx pageTagger layout =
     in
         div
             [ catchNavigationClicks Navigate ]
-            [ Html.header
-                [ class "main-header" ]
-                (sideMenu ctx.user layout.maybeNav)
+            [ sideMenu ctx.user layout.maybeNav
             , main_
                 [ class "row main" ]
                 ([ div
                     [ class "main-container small-12 column"
                     , style transitStyle
                     ]
-                    (List.map (Html.map (pageTagger >> PageMsg)) layout.content)
+                    (tag layout.content)
                  ]
                     ++ dialogItems
                 )
-            ]
-
-
-renderGame : Context -> (msg -> PageMsg) -> Game msg -> Html Msg
-renderGame ctx pageTagger layout =
-    let
-        tag =
-            List.map (Html.map (pageTagger >> PageMsg))
-    in
-        div
-            [ classList
-                [ ( "layout layout-game with-context", True )
-                , ( "show-menu", ctx.layout.showMenu )
-                ]
-            , id layout.id
-            , catchNavigationClicks Navigate
-            ]
-            [ aside
-                [ class "menu" ]
-                (sideMenu ctx.user Nothing)
-            , appbar
-                ctx.user
-                (tag layout.nav)
-            , aside
-                [ class "context" ]
-                (brand (ToggleSidebar True) :: (tag layout.side))
-            , main_
-                []
-                (tag layout.main)
             ]
 
 
@@ -175,25 +144,32 @@ appbarUser user =
         ]
 
 
-sideMenu : User -> Maybe Nav -> List (Html Msg)
-sideMenu user maybeCurrent =
-    [ brand (ToggleSidebar False)
-    , div
-        [ class "project-information" ]
-        [ ul
-            [ class "list-unstyled btn-group-project" ]
-            [ sideMenuItem Route.Home "book" "Home" (maybeCurrent == Just Home)
-            ]
-        ]
-    , div
-        [ class "project-support" ]
-        [ ul
-            [ class "list-unstyled btn-group-project" ]
-            [ sideMenuItem Route.Home "keyboard-o" "Home" (maybeCurrent == Just Home)
-            , sideMenuItem Route.Home "user" "Home" (maybeCurrent == Just Home)
-            ]
-        ]
-    ]
+sideMenu : Maybe User -> Maybe Nav -> Html Msg
+sideMenu maybeUser maybeCurrent =
+    case maybeUser of
+        Nothing ->
+            div [] []
+
+        Just user ->
+            Html.header
+                [ class "main-header" ]
+                [ brand (ToggleSidebar False)
+                , div
+                    [ class "project-information" ]
+                    [ ul
+                        [ class "list-unstyled btn-group-project" ]
+                        [ sideMenuItem Route.Home "book" "Home" (maybeCurrent == Just Home)
+                        ]
+                    ]
+                , div
+                    [ class "project-support" ]
+                    [ ul
+                        [ class "list-unstyled btn-group-project" ]
+                        [ sideMenuItem Route.Home "keyboard-o" "Home" (maybeCurrent == Just Home)
+                        , sideMenuItem Route.Home "user" "Home" (maybeCurrent == Just Home)
+                        ]
+                    ]
+                ]
 
 
 sideMenuItem : Route.Route -> String -> String -> Bool -> Html Msg

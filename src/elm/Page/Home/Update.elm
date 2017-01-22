@@ -1,7 +1,6 @@
 module Page.Home.Update exposing (..)
 
 import Response exposing (..)
-import Model.Shared exposing (..)
 import Page.Home.Model exposing (..)
 import Dialog
 
@@ -11,8 +10,8 @@ mount model =
     res model Cmd.none
 
 
-update : User -> Msg -> Model -> Response Model Msg
-update user msg model =
+update : Msg -> Model -> Response Model Msg
+update msg model =
     case msg of
         AddOne ->
             res model Cmd.none

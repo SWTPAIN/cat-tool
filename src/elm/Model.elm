@@ -1,13 +1,16 @@
 module Model exposing (..)
+
 import Route exposing (Route)
 import Transit
 import Page.Home.Model as Home
 import Page.Login.Model as Login
 import Model.Shared exposing (..)
 
+
 type alias Setup =
-    { user : User
+    { user : Maybe User
     }
+
 
 type Msg
     = AskRoute Route
@@ -18,21 +21,27 @@ type Msg
     | Navigate String
     | ToggleSidebar Bool
 
+
 type PageMsg
     = HomeMsg Home.Msg
     | LoginMsg Login.Msg
+
 
 type alias Pages =
     { home : Home.Model
     , login : Login.Model
     }
 
+
+
 -- MODEL
+
+
 type alias Model =
     Transit.WithTransition
         { route : Route
         , routeJump : Route.RouteJump
-        , user : User
+        , user : Maybe User
         , pages : Pages
         , layout : Layout
         }
@@ -51,4 +60,3 @@ initialModel setup =
     , layout =
         { showMenu = False }
     }
-

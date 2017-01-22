@@ -12,6 +12,7 @@ import Update.Utils exposing (..)
 import Transit
 import Navigation
 
+
 subscriptions : Model -> Sub Msg
 subscriptions ({ pages } as model) =
     let
@@ -26,10 +27,10 @@ subscriptions ({ pages } as model) =
             ]
 
 
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
-update = Response.updateWithEvent eventMsg msgUpdate
+update =
+    Response.updateWithEvent eventMsg msgUpdate
+
 
 init : Setup -> Navigation.Location -> ( Model, Cmd Msg )
 init setup location =
@@ -42,30 +43,36 @@ eventMsg event =
         Event.SetUser p ->
             SetUser p
 
+
 msgUpdate : Msg -> Model -> Response Model Msg
 msgUpdate msg ({ layout } as model) =
-  case msg of
-    SetUser u ->
-        res { model | user = u } (navigate Route.Home)
-    AskRoute route ->
-        askRoute route model |> toResponse
-    RouteTransition subMsg ->
-        Transit.tick RouteTransition subMsg model |> toResponse
-    MountRoute new ->
-        mountRoute new model
-    PageMsg pageMsg ->
-        pageUpdate pageMsg model
-    Navigate path ->
-        res model (Navigation.newUrl path)
+    case msg of
+        SetUser u ->
+            res { model | user = Just u } (navigate Route.Home)
 
-    ToggleSidebar visible ->
-        res { model | layout = { layout | showMenu = visible } } Cmd.none
-        
+        AskRoute route ->
+            askRoute route model |> toResponse
+
+        RouteTransition subMsg ->
+            Transit.tick RouteTransition subMsg model |> toResponse
+
+        MountRoute new ->
+            mountRoute new model
+
+        PageMsg pageMsg ->
+            pageUpdate pageMsg model
+
+        Navigate path ->
+            res model (Navigation.newUrl path)
+
+        ToggleSidebar visible ->
+            res { model | layout = { layout | showMenu = visible } } Cmd.none
 
 
 askRoute : Route -> Model -> ( Model, Cmd Msg )
 askRoute route model =
     Transit.start RouteTransition (MountRoute route) ( 50, 200 ) model
+
 
 mountRoute : Route -> Model -> Response Model Msg
 mountRoute newRoute ({ pages, user, route } as prevModel) =
@@ -89,6 +96,7 @@ mountRoute newRoute ({ pages, user, route } as prevModel) =
             _ ->
                 res model Cmd.none
 
+
 applyHome : Response HomeModel.Model HomeModel.Msg -> Model -> Response Model Msg
 applyHome =
     applyPage (\s pages -> { pages | home = s }) HomeMsg
@@ -105,12 +113,12 @@ applyPage pagesUpdater msgWrapper response model =
         |> mapModel (\p -> { model | pages = pagesUpdater p model.pages })
         |> mapCmd (msgWrapper >> PageMsg)
 
+
 pageUpdate : PageMsg -> Model -> Response Model Msg
-pageUpdate pageMsg ({ pages, user } as model) =
+pageUpdate pageMsg ({ pages } as model) =
     case pageMsg of
         HomeMsg a ->
-            applyHome (Home.update user a pages.home) model
+            applyHome (Home.update a pages.home) model
 
         LoginMsg a ->
             applyLogin (Login.update a pages.login) model
-

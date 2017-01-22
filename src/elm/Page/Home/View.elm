@@ -47,25 +47,15 @@ dialogContent model =
 onboard : Html Msg
 onboard =
     div
-        [ class "row" ]
-        [ div
-            [ class "col-sm-6" ]
-            [ img
-                [ src "/assets/images/screenshot1.png"
-                , class "screenshot"
-                ]
-                []
+        []
+        [ p
+            [ class "subtitle" ]
+            [ text """
+                Welcome to OneSky Pro T Tool"""
+            , span [ class "small ", onClick (ShowDialog FQDialog) ]
+                [ text "Q&A" ]
             ]
-        , div
-            [ class "col-sm-6" ]
-            [ h1 [] [ text "Pro T Tool" ]
-            , p
-                [ class "subtitle", onClick (ShowDialog FQDialog) ]
-                [ text """
-                    Welcome to OneSky Pro T Tool"""
-                ]
-            , Utils.linkTo Login
-                [ class "btn btn-flat btn-transparent" ]
-                [ text "log in" ]
-            ]
+        , Utils.linkTo Login
+            [ class "btn btn-flat btn-transparent" ]
+            [ text "log in" ]
         ]
