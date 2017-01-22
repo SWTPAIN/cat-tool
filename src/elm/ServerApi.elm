@@ -17,6 +17,7 @@ import Encoders exposing (..)
 type alias GetJsonTask a =
     Task Never (Result () a)
 
+
 postLogin : String -> String -> Request User
 postLogin email password =
     let
@@ -32,6 +33,7 @@ postLogin email password =
 postLogout : Request User
 postLogout =
     post "/api/logout" Http.emptyBody playerDecoder
+
 
 recoverFormError : Error -> Task Never (FormResult a)
 recoverFormError error =
@@ -69,14 +71,15 @@ queryString params =
 
 -- Tooling
 
+
 sendForm : (FormResult a -> msg) -> Request a -> Cmd msg
 sendForm toMsg request =
     toFormTask request
         |> Task.perform toMsg
+
 
 toFormTask : Request a -> Task Never (FormResult a)
 toFormTask request =
     toTask request
         |> Task.map Ok
         |> Task.onError recoverFormError
-
