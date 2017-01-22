@@ -26,7 +26,7 @@ postLogin email password =
                 , ( "password", JsEncode.string password )
                 ]
     in
-        post "/api/login" (jsonBody body) playerDecoder
+        post "http://localhost:3000/login" (jsonBody body) playerDecoder
 
 
 postLogout : Request User

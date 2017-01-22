@@ -4,11 +4,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
-import Markdown
 import View.Utils as Utils
 import Model exposing (..)
 import Model.Shared exposing (Context, User)
 import Route
+import Dialog
 import TransitStyle
 
 
@@ -26,6 +26,7 @@ type alias Site msg =
     { id : String
     , maybeNav : Maybe Nav
     , content : List (Html msg)
+    , dialog : Maybe (Dialog.View msg)
     }
 
 
@@ -34,6 +35,7 @@ site id maybeNav content =
     { id = id
     , maybeNav = maybeNav
     , content = content
+    , dialog = Nothing
     }
 
 
@@ -55,34 +57,33 @@ renderSite ctx pageTagger layout =
 
                 _ ->
                     []
+
+        dialogItems =
+            case layout.dialog of
+                Just dialog ->
+                    tag [ dialog.content, dialog.backdrop ]
+
+                Nothing ->
+                    []
+
+        tag =
+            List.map (Html.map (pageTagger >> PageMsg))
     in
         div
-            [ classList
-                [ ( "layout layout-site", True )
-                , ( "show-menu", ctx.layout.showMenu )
-                ]
-            , id layout.id
-            , catchNavigationClicks Navigate
-            ]
-            [ aside
-                [ class "menu" ]
+            [ catchNavigationClicks Navigate ]
+            [ Html.header
+                [ class "main-header" ]
                 (sideMenu ctx.user layout.maybeNav)
-            , div
-                [ class "menu-backdrop"
-                , onClick (ToggleSidebar False)
-                ]
-                []
-            , appbar
-                ctx.user
-                []
             , main_
-                []
-                [ div
-                    [ class "content"
+                [ class "row main" ]
+                ([ div
+                    [ class "main-container small-12 column"
                     , style transitStyle
                     ]
                     (List.map (Html.map (pageTagger >> PageMsg)) layout.content)
-                ]
+                 ]
+                    ++ dialogItems
+                )
             ]
 
 
@@ -117,11 +118,18 @@ renderGame ctx pageTagger layout =
 
 brand : Msg -> Html Msg
 brand clickMsg =
-    a
-        [ class "brand"
-        , onClick clickMsg
-        ]
-        [ span [] [ text "Pro T Tool" ]
+    div [ class "project-account margin-x-small margin-bottom" ]
+        [ a
+            [ class "avatar tip"
+            , attribute "data-original-title" "Change.org - Website"
+            , onClick clickMsg
+            ]
+            [ img
+                [ class "avatar-img"
+                , src "http://placehold.it/50x50"
+                ]
+                []
+            ]
         ]
 
 
@@ -171,26 +179,38 @@ sideMenu : User -> Maybe Nav -> List (Html Msg)
 sideMenu user maybeCurrent =
     [ brand (ToggleSidebar False)
     , div
-        [ class "menu" ]
-        [ sideMenuItem Route.Home "home" "Home" (maybeCurrent == Just Home)
+        [ class "project-information" ]
+        [ ul
+            [ class "list-unstyled btn-group-project" ]
+            [ sideMenuItem Route.Home "book" "Home" (maybeCurrent == Just Home)
+            ]
         ]
-    , hr [] []
+    , div
+        [ class "project-support" ]
+        [ ul
+            [ class "list-unstyled btn-group-project" ]
+            [ sideMenuItem Route.Home "keyboard-o" "Home" (maybeCurrent == Just Home)
+            , sideMenuItem Route.Home "user" "Home" (maybeCurrent == Just Home)
+            ]
+        ]
     ]
 
 
 sideMenuItem : Route.Route -> String -> String -> Bool -> Html Msg
 sideMenuItem route icon label current =
-    div
+    li
         [ classList
-            [ ( "menu-item", True )
+            [ ( "btn-group-item", True )
             , ( "current", current )
             ]
         ]
-        [ Utils.linkTo
-            route
-            []
-            [ Utils.mIcon icon []
-            , text label
+        [ span
+            [ class "tip" ]
+            [ Utils.linkTo
+                route
+                [ class "btn-project" ]
+                [ Utils.mIcon icon []
+                ]
             ]
         ]
 

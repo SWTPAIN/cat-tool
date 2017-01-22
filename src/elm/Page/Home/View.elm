@@ -2,11 +2,15 @@ module Page.Home.View exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Model.Shared exposing (..)
 import Route exposing (..)
 import Page.Home.Model exposing (..)
 import View.Utils as Utils exposing (..)
 import View.Layout as Layout
+import View.Common as Common
+import Dialog
+
 
 view : Context -> Model -> Layout.Site Msg
 view ctx model =
@@ -20,13 +24,24 @@ view ctx model =
             [ class "white inside" ]
             [ div
                 [ class "row live-center" ]
-                [ ]
+                []
             , div
                 [ class "row" ]
                 []
             ]
         ]
+        (Just (Dialog.view DialogMsg model.dialog (dialogContent model)))
     )
+
+
+dialogContent : Model -> Dialog.Layout msg
+dialogContent model =
+    case model.showDialog of
+        Empty ->
+            Dialog.emptyLayout
+
+        FQDialog ->
+            Common.fqDialog
 
 
 onboard : Html Msg
@@ -43,16 +58,14 @@ onboard =
             ]
         , div
             [ class "col-sm-6" ]
-            [ h1 [] [ text "Sailing tactics from the sofa" ]
+            [ h1 [] [ text "Pro T Tool" ]
             , p
-                [ class "subtitle" ]
+                [ class "subtitle", onClick (ShowDialog FQDialog) ]
                 [ text """
-                    Tacks is a free regatta simulation game.
-                    engage yourself in a realtime multiuser race
-                    or attempt to break your best time to climb the rankings."""
+                    Welcome to OneSky Pro T Tool"""
                 ]
             , Utils.linkTo Login
                 [ class "btn btn-flat btn-transparent" ]
-                [ text "or log in" ]
+                [ text "log in" ]
             ]
         ]

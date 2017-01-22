@@ -7,7 +7,6 @@ import Json.Decode as Json
 import String
 import Form.Error exposing (..)
 import Constants exposing (..)
-import Model.Shared exposing (..)
 import Route exposing (Route)
 import Time exposing (Time)
 import Date
@@ -96,8 +95,8 @@ abbr_ short long =
 mIcon : String -> List String -> Html msg
 mIcon name classes =
     i
-        [ class ("material-icons" :: classes |> String.join " ") ]
-        [ text name ]
+        [ class (("icon icon-" ++ name) :: classes |> String.join " ") ]
+        []
 
 
 nbsp : Html msg
@@ -156,6 +155,7 @@ loading =
             [ class "loading-pulse" ]
             []
         ]
+
 
 tabsRow : List ( String, tab ) -> (tab -> Attribute msg) -> (tab -> Bool) -> Html msg
 tabsRow items toAttr isSelected =
